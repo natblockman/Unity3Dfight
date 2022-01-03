@@ -14,6 +14,7 @@ public class EnemyController : MonoBehaviour
     private NavMeshAgent navMeshAgent;
 
     private Transform playerTarget;
+    public Transform LookAtTarget;
 
     public float moveSpeed = 3.5f;
     public float attackDistance = 1f;
@@ -26,11 +27,14 @@ public class EnemyController : MonoBehaviour
 
     public GameObject attackPoint;
 
+    private CharacterSoundFX SoundFX;
+
     // Start is called before the first frame update
     void Awake()
     {
         enemyAnim = GetComponent<CharacterAnimation>();
         navMeshAgent = GetComponent<NavMeshAgent>();
+        SoundFX = GetComponentInChildren<CharacterSoundFX>();
 
         playerTarget = GameObject.FindGameObjectWithTag(Tags.PLAYER_TAG).transform;
     }
@@ -50,6 +54,7 @@ public class EnemyController : MonoBehaviour
         }
         if(enemyState== EnemyState.ATTACK)
         {
+            transform.LookAt(LookAtTarget);
             AttackPlayer();
         }
     }
@@ -86,10 +91,12 @@ public class EnemyController : MonoBehaviour
             if (Random.Range(0, 2) > 0)
             {
                 enemyAnim.Attack0();
+                SoundFX.Attack_Sound1();
             }
             else
             {
                 enemyAnim.Attack1();
+                SoundFX.Attack_Sound2();
             }
 
             attackTimer=0;

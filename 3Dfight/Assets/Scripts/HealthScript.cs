@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class HealthScript : MonoBehaviour
 {
@@ -14,6 +15,18 @@ public class HealthScript : MonoBehaviour
 
     public bool isPlayer;
 
+    public Image health_UI;
+
+    [HideInInspector]
+    public bool shieldActivated;
+
+    private CharacterSoundFX soundFX;
+
+    private void Awake()
+    {
+        soundFX=GetComponentInChildren<CharacterSoundFX>();
+    }
+
 
     void Update()
     {
@@ -24,9 +37,21 @@ public class HealthScript : MonoBehaviour
     }
     public void ApplyDamage(float damage)
     {
+        if (shieldActivated)
+        {
+            return;
+        }
+
         health -= damage;
+
+        if (health_UI != null)
+        {
+            health_UI.fillAmount = health/100f;
+        }
+
         if (health <= 0)
         {
+            soundFX.DieSound();
             GetComponent<Animator>().enabled = false;
 
             StartCoroutine(AllowRotate());
@@ -35,6 +60,9 @@ public class HealthScript : MonoBehaviour
             {
                 GetComponent<PlayerMovement>().enabled = false;
                 GetComponent<PlayerAttackInput>().enabled = false;
+
+                Camera.main.transform.SetParent(null);
+                GameObject.FindGameObjectWithTag(Tags.ENEMY_TAG).GetComponent<EnemyController>().enabled=false;
             }
             else
             {
